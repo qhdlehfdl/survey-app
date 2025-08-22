@@ -1,302 +1,10 @@
-/* MainPage.module.css — greeting centered, cards taller, spaced and centered */
-
-.mainContainer {
+.container {
+  position: relative;
   font-family: "Noto Sans KR", sans-serif;
   padding: 20px;
-  max-width: 1100px;
-  margin: 0 auto;
-  box-sizing: border-box;
 }
 
-/* Header: keep layout but allow centered greeting */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-bottom: 30px;
-  position: relative;
-  min-height: 60px;     /* 더 여유 주기 */
-  padding-top: 8px;     /* 상단 여백 확보 */
-  padding-bottom: 8px;
-  box-sizing: border-box;
-}
-
-/* Centered greeting: move down a bit from very top */
-.greeting {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 10px;            /* <-- 추가: 위쪽 여백 설정 (조정 가능) */
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: #111827;
-  pointer-events: none;
-  white-space: nowrap;
-}
-
-/* Ensure the headerRight stays visible to the right */
-.headerRight {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  z-index: 2;
-}
-
-/* logout button */
-.logoutBtn {
-  background: #ff4d4f;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-}
-.logoutBtn:hover {
-  background: #d9363e;
-}
-
-/* Survey list: single column vertical scroll, centered cards with side gutters */
-.surveyList {
-  display: grid;
-  grid-template-columns: 1fr;   /* single column */
-  gap: 36px;                    /* 세로 간격 증가 (카드 간 여백) */
-  justify-content: center;      /* 전체 그리드를 가운데 정렬 (side gutters 확보) */
-  padding-left: 32px;           /* 사이드 여유 더 확보 */
-  padding-right: 32px;
-  box-sizing: border-box;
-}
-
-/* Card: larger/taller, centered within grid column, constrained width */
-.surveyCard {
-  background: white;
-  padding: 28px;
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-  text-align: left;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-
-  /* center and constrain width to leave side gutters */
-  margin: 0 auto;      /* <-- 카드 자체를 가운데 정렬 */
-  width: 700px;         /* <-- 가로 크기 자동(컨텐츠 / max-width에 따름) */
-  max-width: 880px;    /* <-- 카드 최대 너비 (조정 가능) */
-  box-sizing: border-box;
-  min-height: 220px;   /* <-- 카드 높이 더 늘림 (요청 반영) */
-}
-
-/* small visual tweak for hover */
-.surveyCard:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.10);
-}
-
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.cardMain {
-  flex: 1;
-}
-
-.cardTitle {
-  font-size: 20px;
-  margin: 0;
-  line-height: 1.2;
-  color: #111827;
-}
-
-.cardMeta {
-  margin-top: 8px;
-  color: #666;
-  font-size: 13px;
-}
-
-.cardDesc {
-  font-size: 15px;
-  color: #374151;
-  margin: 14px 0 18px 0;
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-
-/* participant badge (slightly larger) */
-.participantBadge {
-  margin-left: 12px;
-  background: #f3f4f6;
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-size: 13px;
-  color: #111827;
-  border: 1px solid #e5e7eb;
-  min-width: 88px;
-  text-align: center;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.participantLabel {
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.participantValue {
-  font-weight: 700;
-}
-
-/* actions */
-.cardActions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.viewBtn {
-  background: #1677ff;
-  color: white;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.viewBtn:hover {
-  background: #125ac2;
-}
-
-/* bottom action */
-.bottomAction {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.createBtn {
-  background: #52c41a;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-}
-.createBtn:hover {
-  background: #3fa112;
-}
-
-/* messages */
-.message {
-  padding: 24px;
-  text-align: center;
-  color: #444;
-}
-.error {
-  padding: 24px;
-  text-align: center;
-  color: #c0392b;
-}
-
-/* profile icon area */
-.headerButtons {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.editBtn {
-  margin-top: 8px;
-  margin-bottom: 4px;
-  padding: 8px 12px;
-  background-color: #4cafef;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-}
-
-.editBtn:hover {
-  background-color: #1c88d6;
-}
-
-
-.profileBtn {
-  background: transparent;
-  border: none;
-  padding: 6px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-.profileBtn:focus {
-  outline: 2px solid rgba(0, 123, 255, 0.6);
-  outline-offset: 2px;
-}
-.profileIcon {
-  width: 22px;
-  height: 22px;
-  fill: currentColor;
-}
-.sentinel {
-  height: 1px;
-  width: 100%;
-  display: block;
-  visibility: hidden;
-}
-
-/* loading indicator shown while fetching more pages */
-.loadingMore {
-  width: 100%;
-  text-align: center;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  color: #666;
-  font-size: 14px;
-}
-
-/* endMessage: centered, attached just after the card list, consistent spacing */
-.endMessage {
-  width: 100%;
-  text-align: center;
-  margin-top: 18px;      /* gap between last card and this message */
-  margin-bottom: 24px;   /* some breathing room below */
-  color: #666;
-  font-size: 14px;
-  background: transparent;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-}
-
-/* small visual style for a subtle badge/icon inside endMessage if you want */
-.endMessage .emoji {
-  font-size: 18px;
-  line-height: 1;
-}
-
-/* ProfilePage.module.css (추가) */
-
-.container {
-  position: relative; /* 홈 버튼 절대 위치를 위해 필요 */
-}
-
-/* 홈 버튼 (왼쪽 상단) */
+/* 홈 버튼 */
 .homeBtn {
   position: absolute;
   top: 12px;
@@ -313,38 +21,106 @@
   cursor: pointer;
   z-index: 80;
   transition: transform 120ms ease, box-shadow 120ms ease;
-  color: #333; /* SVG currentColor 사용 */
+  color: #333;
+}
+.homeBtn:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(15,23,42,0.08);}
+.homeBtn:active { transform: translateY(0); }
+
+/* header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+  min-height: 60px;
+  margin-bottom: 30px;
+}
+.greeting {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 10px;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.headerRight {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  z-index: 2;
+}
+.logoutBtn {
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.logoutBtn:hover { background: #d9363e; }
+
+/* survey list */
+.surveyList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 36px;
+  justify-content: center;
+  padding-left: 32px;
+  padding-right: 32px;
+  box-sizing: border-box;
 }
 
-.homeBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+/* survey card */
+.surveyCard {
+  background: white;
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0 auto;
+  width: 700px;
+  max-width: 880px;
+  min-height: 220px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
+.surveyCard:hover { transform: translateY(-6px); box-shadow: 0 12px 28px rgba(0,0,0,0.10); }
 
-.homeBtn:active {
-  transform: translateY(0);
-}
+.cardHeader { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.cardTitle { font-size: 20px; margin: 0; color: #111827; }
+.participantBadge { background: #f3f4f6; padding: 8px 12px; border-radius: 999px; font-size: 13px; color: #111827; border: 1px solid #e5e7eb; min-width: 88px; text-align: center; display: inline-flex; align-items: center; justify-content: center; }
 
-/* 모바일에서 너무 왼쪽에 붙어있다면 패딩 고려 */
-@media (max-width: 480px) {
-  .homeBtn {
-    top: 8px;
-    left: 8px;
-    width: 36px;
-    height: 36px;
-  }
+.cardActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
 }
+.editBtn { background-color: #4cafef; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+.editBtn:hover { background-color: #1c88d6; }
+.viewBtn { background-color: #1677ff; color: white; border: none; padding: 10px 14px; border-radius: 8px; cursor: pointer; }
+.viewBtn:hover { background-color: #125ac2; }
+.deleteBtn { background-color: #f44336; color: white; border: none; padding: 10px 14px; border-radius: 8px; cursor: pointer; }
+.deleteBtn:hover { background-color: #d32f2f; }
+
+.message, .error { text-align: center; padding: 24px; color: #444; }
+.error { color: #c0392b; }
+
+.loadingMore, .endMessage { width: 100%; text-align: center; margin-top: 8px; font-size: 14px; color: #666; }
+.sentinel { height: 1px; width: 100%; display: block; visibility: hidden; }
 
 /* responsive adjustments */
 @media (max-width: 980px) {
-  .surveyGrid { padding-left: 20px; padding-right: 20px; gap: 28px; }
   .surveyCard { max-width: 720px; padding: 22px; min-height: 200px; }
   .cardTitle { font-size: 18px; }
 }
-
 @media (max-width: 640px) {
-  .mainContainer { padding: 14px; }
-  .surveyGrid { padding-left: 12px; padding-right: 12px; gap: 20px; }
   .surveyCard { max-width: 100%; padding: 16px; min-height: 180px; }
   .cardTitle { font-size: 17px; }
   .greeting { font-size: 18px; top: 8px; }

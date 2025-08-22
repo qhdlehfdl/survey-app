@@ -449,4 +449,25 @@ public class SurveyServiceImpl implements SurveyService {
             return SurveyUpdateResponseDto.databaseError();
         }
     }
+
+    @Override
+    @Transactional
+    public ResponseEntity<? super DeleteSurveyResponseDto> deleteSurvey(Integer userId, Integer surveyId) {
+        try {
+            Optional<Survey> surveyOpt = surveyRepository.findById(surveyId);
+            if(surveyOpt.isEmpty()) return DeleteSurveyResponseDto.notExistedSurvey();
+            Survey survey = surveyOpt.get();
+
+            Optional<User> userOpt = userRepository.findById(userId);
+            if(userOpt.isEmpty()) return DeleteSurveyResponseDto.notExistedUser();
+
+            if(!survey.getWriter().getId().equals(userOpt.get().getId())) return DeleteSurveyResponseDto.authorizationFail();
+
+            surveyRepository.delete(survey);
+            return DeleteSurveyResponseDto.success();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return DeleteSurveyResponseDto.databaseError();
+        }
+    }
 }

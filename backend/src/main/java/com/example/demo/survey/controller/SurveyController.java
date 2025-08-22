@@ -48,8 +48,14 @@ public class SurveyController {
     }
 
     @PatchMapping("/{survey_id}")
-    public ResponseEntity<? super SurveyUpdateResponseDto> surveyUpdate(@AuthenticationPrincipal Integer userId, @PathVariable("survey_id") Integer surveyId, @Valid @RequestBody SurveyRegisterRequestDto dto) {
+    public ResponseEntity<? super SurveyUpdateResponseDto> updateSurvey(@AuthenticationPrincipal Integer userId, @PathVariable("survey_id") Integer surveyId, @Valid @RequestBody SurveyRegisterRequestDto dto) {
         ResponseEntity<? super SurveyUpdateResponseDto> response = surveyService.updateSurvey(userId, surveyId, dto);
+        return response;
+    }
+
+    @DeleteMapping("/{survey_id}")
+    public ResponseEntity<? super DeleteSurveyResponseDto> deleteSurvey(@AuthenticationPrincipal Integer userId, @PathVariable("survey_id") Integer surveyId) {
+        ResponseEntity<? super DeleteSurveyResponseDto> response = surveyService.deleteSurvey(userId, surveyId);
         return response;
     }
 }

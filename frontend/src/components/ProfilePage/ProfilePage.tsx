@@ -4,6 +4,7 @@ import { getMyProfile } from "../../api/getMyProfile"; // lastId 기반
 import styles from "./ProfilePage.module.css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext"; // 추가
+import { deleteSurvey } from "../../api/deleteSurvey";
 
 type Survey = {
   id: number;
@@ -95,6 +96,22 @@ export default function ProfilePage() {
     },
     [hasMore]
   );
+
+  const handleDeleteSurvey = async (surveyId: number) => {
+    if (!window.confirm("정말 이 설문을 삭제하시겠습니까?")) return;
+
+    try {
+      await deleteSurvey(surveyId);
+
+      // 삭제 후 UI에서 바로 제거
+      setSurveys((prev) => prev.filter((s) => s.id !== surveyId));
+      seenIdsRef.current.delete(surveyId);
+      alert("설문이 삭제되었습니다.");
+    } catch (err) {
+      console.error("삭제 실패:", err);
+      alert("설문 삭제에 실패했습니다.");
+    }
+  };
 
   // 초기 로드 (한 번만 실행)
   useEffect(() => {
@@ -197,25 +214,32 @@ export default function ProfilePage() {
                 </span>
               </div>
 
-              {/* 새로 추가한 설문지 수정 버튼 */}
-              <button
-                className={styles.editBtn}
-                onClick={() =>
-                  navigate(`/survey/${s.id}/edit`, {
-                    state: { participantsNum: s.participantsNum },
-                  })
-                }
-              >
-                설문지 수정
-              </button>
+              <div className={styles.cardActions}>
+                <button
+                  className={styles.editBtn}
+                  onClick={() =>
+                    navigate(`/survey/${s.id}/edit`, {
+                      state: { participantsNum: s.participantsNum },
+                    })
+                  }
+                >
+                  설문지 수정
+                </button>
 
-              {/* 기존 결과 보기 버튼 */}
-              <button
-                className={styles.viewBtn}
-                onClick={() => navigate(`/survey/${s.id}/result`)}
-              >
-                결과 보기
-              </button>
+                {/* 기존 결과 보기 버튼 */}
+                <button
+                  className={styles.viewBtn}
+                  onClick={() => navigate(`/survey/${s.id}/result`)}
+                >
+                  결과 보기
+                </button>
+                <button
+                  className={styles.deleteBtn}
+                  onClick={() => handleDeleteSurvey(s.id)}
+                >
+                  삭제
+                </button>
+              </div>
             </div>
           ))}
         </div>
