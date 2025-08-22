@@ -1,0 +1,20 @@
+# Backend (Spring Boot)
+backend/target/
+backend/.idea/
+backend/.classpath
+backend/.project
+backend/.settings/
+
+# Frontend (React)
+frontend/node_modules/
+frontend/build/
+frontend/.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IntelliJ / VSCode
+*.iml
+.vscode/
+.idea/
