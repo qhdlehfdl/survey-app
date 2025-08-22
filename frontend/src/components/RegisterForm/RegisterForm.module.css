@@ -1,0 +1,78 @@
+.registerContainer {
+    width: 360px;
+    padding: 40px 30px;
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin: 80px auto;
+  }
+  
+  .registerTitle {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  
+  .formGroup {
+    margin-bottom: 18px;
+  }
+  
+  .formLabel {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 6px;
+    display: block;
+  }
+  
+  .formInput {
+    width: 100%;
+    max-width: 300px;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.3s;
+  }
+  
+  .formInput:focus {
+    border-color: #3366ff;
+  }
+  
+  .registerButton {
+    width: 100%;
+    padding: 12px;
+    background-color: #3366ff;
+    border: none;
+    color: white;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 12px;
+  }
+  
+  .registerButton:hover {
+    background-color: #274fcc;
+  }
+  
+  .footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: #6b7280;
+  }
+  
+  .footer a {
+    color: #3366ff;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .errorText {
+    color: red;
+    font-size: 12px;
+    margin-top: 4px;
+  }

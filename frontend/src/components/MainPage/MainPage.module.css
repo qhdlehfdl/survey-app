@@ -1,0 +1,252 @@
+/* MainPage.module.css */
+
+.mainContainer {
+  font-family: "Noto Sans KR", sans-serif;
+  padding: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.logoutBtn {
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.logoutBtn:hover {
+  background: #d9363e;
+}
+
+.surveyGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* Card */
+.surveyCard {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  text-align: left;
+  transition: transform 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.surveyCard:hover {
+  transform: translateY(-4px);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.cardMain {
+  flex: 1;
+}
+
+.cardTitle {
+  font-size: 18px;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.cardMeta {
+  margin-top: 6px;
+  color: #666;
+  font-size: 13px;
+}
+
+.cardDesc {
+  font-size: 14px;
+  color: #555;
+  margin: 12px 0 15px 0;
+  flex: 1;
+}
+
+/* participant badge */
+.participantBadge {
+  margin-left: 12px;
+  background: #f3f4f6;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  min-width: 72px;
+  text-align: center;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.participantLabel {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.participantValue {
+  font-weight: 700;
+}
+
+/* actions */
+.cardActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.viewBtn {
+  background: #1677ff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.viewBtn:hover {
+  background: #125ac2;
+}
+
+/* pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 25px 0;
+  gap: 10px;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  border: none;
+  background: #f0f0f0;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  font-weight: 600;
+}
+
+/* bottom action */
+.bottomAction {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.createBtn {
+  background: #52c41a;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.createBtn:hover {
+  background: #3fa112;
+}
+
+/* messages */
+.message {
+  padding: 24px;
+  text-align: center;
+  color: #444;
+}
+
+.error {
+  padding: 24px;
+  text-align: center;
+  color: #c0392b;
+}
+
+/* 프로필 버튼 (작고 원형 아이콘) */
+.headerButtons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* 프로필 아이콘 버튼 */
+.profileBtn {
+  background: transparent;
+  border: none;
+  padding: 6px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* 포커스 스타일 (접근성 개선) */
+.profileBtn:focus {
+  outline: 2px solid rgba(0, 123, 255, 0.6);
+  outline-offset: 2px;
+}
+
+/* SVG 크기 */
+.profileIcon {
+  width: 22px;
+  height: 22px;
+  fill: currentColor; /* 상속된 글자색을 사용 */
+}
+
+/* 페이지 버튼 목록 컨테이너 */
+.pageList {
+  display: inline-flex;
+  gap: 8px;
+  margin: 0 12px;
+  align-items: center;
+}
+
+/* 개별 페이지 버튼 */
+.pageButton {
+  min-width: 36px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #e6e9ef;
+  background: white;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* 비활성화(현재 아님) 버튼 스타일 (optional) */
+.pageButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+}
+
+/* 현재 페이지 강조 */
+.pageButtonActive {
+  background: #1a73e8;
+  color: white;
+  border-color: #1a73e8;
+  box-shadow: 0 6px 14px rgba(26,115,232,0.12);
+}

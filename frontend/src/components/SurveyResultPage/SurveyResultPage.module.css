@@ -1,0 +1,110 @@
+.container {
+  max-width: 900px;
+  margin: 24px auto;
+  padding: 20px;
+  font-family: Inter, "Noto Sans KR", Arial, sans-serif;
+}
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.title {
+  margin: 0;
+  font-size: 24px;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+}
+.backButton {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #e6e9ef;
+  background: white;
+  cursor: pointer;
+}
+.loading {
+  padding: 20px;
+}
+.error {
+  color: #e74c3c;
+  padding: 20px;
+}
+.participants {
+  color: #7b7f87;
+  margin-bottom: 12px;
+}
+.grid {
+  display: grid;
+  gap: 18px;
+}
+.card {
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid #eef0f2;
+}
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.questionText {
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+}
+.questionMeta {
+  font-size: 12px;
+  color: #8c8f95;
+}
+.answerContainer {
+  margin-top: 12px;
+}
+.answerList {
+  margin: 0;
+  padding-left: 16px;
+}
+.answerItem {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.noAnswer {
+  margin-top: 8px;
+  color: #6c757d;
+}
+.optionContainer {
+  margin-top: 12px;
+}
+.optionList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.optionRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.optionText {
+  min-width: 160px;
+}
+.track {
+  flex: 1;
+  background: #f1f3f5;
+  height: 24px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  transition: width 300ms ease;
+  background: linear-gradient(90deg,#6c5ce7,#00b894);
+}
+.count {
+  width: 56px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
