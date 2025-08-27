@@ -15,6 +15,13 @@ Typescript + SpringBoot 기반으로 제작하였고 JWT 인증을 사용하였�
 - Spring Security, JWT
 - JPA, MySQL, Redis
 
+---
+
+## ⚙️ERD
+<img width="1170" height="912" alt="survey ERD" src="https://github.com/user-attachments/assets/7c8a1623-6fa3-4607-8e6d-864d8ee5b5fb" />
+
+---
+
 ## 🖥️ 실행 화면
 <details>
   <summary>메인 페이지</summary>
