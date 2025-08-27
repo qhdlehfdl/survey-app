@@ -52,6 +52,7 @@ Typescript + SpringBoot 기반으로 제작하였고 JWT 인증을 사용하였�
 
 ## 배포
 url: http://52.63.0.110/main
+
 aws-ec2, aws-rds 사용
 <details>
   <img width="1812" height="990" alt="image" src="https://github.com/user-attachments/assets/9ffd3c15-4fc1-4c0d-aa5a-4d3601db1b34" />
