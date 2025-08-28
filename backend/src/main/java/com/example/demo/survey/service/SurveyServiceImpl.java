@@ -49,6 +49,7 @@ public class SurveyServiceImpl implements SurveyService {
 
             if(!qDtos.isEmpty()){
                 int questionOrder = 1;
+
                 for(QuestionRequestDto qDto: qDtos){
                     Question q = new Question(qDto, questionOrder++, survey);
                     List<String> qOptions = qDto.getOptions();
@@ -164,10 +165,6 @@ public class SurveyServiceImpl implements SurveyService {
                 Question q = questionByUuid.get(uuid);
                 JsonNode jsonAnswer = answerDto.getAnswer();
 
-                System.out.println(uuid);
-                System.out.println(q.getText());
-                System.out.println(jsonAnswer);
-
                 //required에 답했는지 확인
                 if(q.isRequired() && jsonAnswer.isNull()) return AnswerSubmitResponseDto.emptyAnswer();
 
@@ -182,7 +179,6 @@ public class SurveyServiceImpl implements SurveyService {
                             break;
                         }
 
-                        System.out.println("qwerzxcv");
                         if (!jsonAnswer.isTextual()) return AnswerSubmitResponseDto.invalidAnswer();
 
                         answer = new Answer(response, q);
@@ -217,7 +213,6 @@ public class SurveyServiceImpl implements SurveyService {
 
                         //체크박스인 경우 프론트에서 무조건 배열로 보냄
                         if (!jsonAnswer.isNull() && !jsonAnswer.isArray()) return AnswerSubmitResponseDto.invalidAnswer();
-                        System.out.println("zcxv");
 
                         answer = new Answer(response, q);
 
