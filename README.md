@@ -17,7 +17,8 @@ Typescript + SpringBoot 기반으로 제작하였고 JWT 인증을 사용하였�
 
 ---
 ## 📜 API 명세서
-- Swagger
+- Swagger를 통한 api 문서 자동화
+
 [index.html](https://github.com/user-attachments/files/22019524/index.html)
 
 
