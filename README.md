@@ -16,6 +16,10 @@ Typescript + SpringBoot 기반으로 제작하였고 JWT 인증을 사용하였�
 - JPA, MySQL, Redis
 
 ---
+## 📜 API 명세서
+- Swagger
+[index.html](https://github.com/user-attachments/files/22019524/index.html)
+
 
 ## ⚙️ERD
 <img width="1170" height="912" alt="survey ERD" src="https://github.com/user-attachments/assets/7c8a1623-6fa3-4607-8e6d-864d8ee5b5fb" />
