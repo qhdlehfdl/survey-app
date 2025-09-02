@@ -73,50 +73,50 @@ public class AuthCotroller {
         return response;
     }
 
-    @Operation(
-            summary = "로그인",
-            description = "로그인 형식에 맞춰 보내야함",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "로그인 JSON body 데이터",
-                    required = true,
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = SignInRequestDto.class)
-                    )
-            ),
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "로그인 성공",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = SignInResponseDto.class)
-                            )
-                    )  ,
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "로그인 실패",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ResponseDto.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "500",
-                            description = "데이터베이스 오류",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ResponseDto.class)
-                            )
-                    )
-            }
-
-    )
-    @PostMapping("/sign-in")
-    public ResponseEntity<? super SignInResponseDto> signIn(@Valid @RequestBody SignInRequestDto dto) {
-        ResponseEntity<? super SignInResponseDto> response = authService.signIn(dto);
-        return response;
-    }
+//    @Operation(
+//            summary = "로그인",
+//            description = "로그인 형식에 맞춰 보내야함",
+//            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+//                    description = "로그인 JSON body 데이터",
+//                    required = true,
+//                    content = @Content(
+//                            mediaType = "application/json",
+//                            schema = @Schema(implementation = SignInRequestDto.class)
+//                    )
+//            ),
+//            responses = {
+//                    @ApiResponse(
+//                            responseCode = "200",
+//                            description = "로그인 성공",
+//                            content = @Content(
+//                                    mediaType = "application/json",
+//                                    schema = @Schema(implementation = SignInResponseDto.class)
+//                            )
+//                    )  ,
+//                    @ApiResponse(
+//                            responseCode = "401",
+//                            description = "로그인 실패",
+//                            content = @Content(
+//                                    mediaType = "application/json",
+//                                    schema = @Schema(implementation = ResponseDto.class)
+//                            )
+//                    ),
+//                    @ApiResponse(
+//                            responseCode = "500",
+//                            description = "데이터베이스 오류",
+//                            content = @Content(
+//                                    mediaType = "application/json",
+//                                    schema = @Schema(implementation = ResponseDto.class)
+//                            )
+//                    )
+//            }
+//
+//    )
+//    @PostMapping("/sign-in")
+//    public ResponseEntity<? super SignInResponseDto> signIn(@Valid @RequestBody SignInRequestDto dto) {
+//        ResponseEntity<? super SignInResponseDto> response = authService.signIn(dto);
+//        return response;
+//    }
 
     @Operation(
             summary = "토큰 리프레쉬",
@@ -163,41 +163,41 @@ public class AuthCotroller {
         return response;
     }
 
-    @Operation(
-            summary = "로그아웃",
-            description = "refresh token 삭제",
-            responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "로그아웃 성공",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = LogOutResponseDto.class)
-                            )
-                    )  ,
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "refresh token 유효하지 않아서 로그아웃 실패지만 프론트에서는 로그아웃처리",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ResponseDto.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "500",
-                            description = "데이터베이스 오류",
-                            content = @Content(
-                                    mediaType = "application/json",
-                                    schema = @Schema(implementation = ResponseDto.class)
-                            )
-                    )
-            }
-    )
-    @PostMapping("/logout")
-    public ResponseEntity<? super LogOutResponseDto> logout(HttpServletRequest request) {
-        ResponseEntity<? super LogOutResponseDto> result = authService.logout(request);
-        return result;
-    }
+//    @Operation(
+//            summary = "로그아웃",
+//            description = "refresh token 삭제",
+//            responses = {
+//                    @ApiResponse(
+//                            responseCode = "200",
+//                            description = "로그아웃 성공",
+//                            content = @Content(
+//                                    mediaType = "application/json",
+//                                    schema = @Schema(implementation = LogOutResponseDto.class)
+//                            )
+//                    )  ,
+//                    @ApiResponse(
+//                            responseCode = "403",
+//                            description = "refresh token 유효하지 않아서 로그아웃 실패지만 프론트에서는 로그아웃처리",
+//                            content = @Content(
+//                                    mediaType = "application/json",
+//                                    schema = @Schema(implementation = ResponseDto.class)
+//                            )
+//                    ),
+//                    @ApiResponse(
+//                            responseCode = "500",
+//                            description = "데이터베이스 오류",
+//                            content = @Content(
+//                                    mediaType = "application/json",
+//                                    schema = @Schema(implementation = ResponseDto.class)
+//                            )
+//                    )
+//            }
+//    )
+//    @PostMapping("/logout")
+//    public ResponseEntity<? super LogOutResponseDto> logout(HttpServletRequest request) {
+//        ResponseEntity<? super LogOutResponseDto> result = authService.logout(request);
+//        return result;
+//    }
 
     @Operation(
             summary = "간단한 계정 정보, 자신이 작성한 설문지, 무한스크롤 정보 제공",

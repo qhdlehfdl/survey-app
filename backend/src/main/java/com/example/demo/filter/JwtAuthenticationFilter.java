@@ -1,5 +1,11 @@
-package com.example.demo.token;
+package com.example.demo.filter;
 
+import com.example.demo.auth.dto.request.SignInRequestDto;
+import com.example.demo.auth.dto.response.CustomUserDetails;
+import com.example.demo.auth.entity.User;
+import com.example.demo.auth.repository.UserRepository;
+import com.example.demo.token.JwtProvider;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,23 +25,19 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
 
         try{
-            String path = request.getRequestURI();
-//            if (path.equals("/api/auth/logout") ) {
-//                filterChain.doFilter(request, response);
-//                return;
-//            }
-
             String token = parseBearerToken(request);
 
             if (token == null) {
@@ -49,13 +52,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            AbstractAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(Id, null, AuthorityUtils.NO_AUTHORITIES);
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            Optional<User> userOpt = userRepository.findById(Id);
+            if(userOpt.isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json;charset=UTF-8");
+                response.getWriter().write("{\"code\":\"NP\",\"message\":\"User not found.\"}");
+                return;
+            }
 
-            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-            securityContext.setAuthentication(authenticationToken);
+            CustomUserDetails customUserDetails = new CustomUserDetails(userOpt.get());
+            Authentication authentication = new UsernamePasswordAuthenticationToken(customUserDetails.getId(), null, customUserDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            SecurityContextHolder.setContext(securityContext);
+            filterChain.doFilter(request, response);
         }catch (ExpiredJwtException exception){
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -64,8 +73,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }catch (Exception e){
             e.printStackTrace();
         }
-
-        filterChain.doFilter(request,response);
     }
 
     private String parseBearerToken(HttpServletRequest request){

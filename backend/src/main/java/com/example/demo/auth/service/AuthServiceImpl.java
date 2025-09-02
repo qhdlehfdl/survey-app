@@ -81,8 +81,10 @@ public class AuthServiceImpl implements AuthService{
 
             Integer id = user.getId();
 
-            accessToken = jwtProvider.createAccessKey(id);
-            refreshToken = jwtProvider.createRefreshKey(id);
+            String role = "ROLE_USER";
+
+            accessToken = jwtProvider.createAccessKey(id, role);
+            refreshToken = jwtProvider.createRefreshKey(id, role);
 
             refreshTokenService.saveToken(id, refreshToken);
         } catch (Exception e) {
@@ -107,12 +109,15 @@ public class AuthServiceImpl implements AuthService{
             }
         }
 
+        System.out.println("refreshToken : " + refreshToken);
+
         if (refreshToken == null) return RefreshTokenResponseDto.invalidRefreshToken();
 
         Integer userId;
 
         try {
             userId = jwtProvider.validateRefreshToken(refreshToken);
+        System.out.println("userId : " + userId.toString());
         } catch (ExpiredJwtException e) {
             e.printStackTrace();
             return RefreshTokenResponseDto.expiredRefreshToken();
@@ -123,6 +128,8 @@ public class AuthServiceImpl implements AuthService{
 
 
         if (userId == null) return RefreshTokenResponseDto.invalidRefreshToken();
+
+        String role = jwtProvider.getRoleFromRefreshToken(refreshToken);
 
         //redis에서 refresh token 가져옴
         Optional<String> refreshTokenOpt = refreshTokenService.getToken(userId);
@@ -135,8 +142,10 @@ public class AuthServiceImpl implements AuthService{
         //이미 사용된 토큰
         if (blacklistService.isBlacklisted(refreshToken)) return RefreshTokenResponseDto.invalidRefreshToken();
 
-        String newAccessToken = jwtProvider.createAccessKey(userId);
-        String newRefreshToken = jwtProvider.createRefreshKey(userId);
+        System.out.println("storedRefreshToken : "+storedRefreshToken);
+
+        String newAccessToken = jwtProvider.createAccessKey(userId, role);
+        String newRefreshToken = jwtProvider.createRefreshKey(userId, role);
 
         //블랙리스트에 현재 refresh token 추가
         Duration remaining = jwtProvider.getRemainingValidity(refreshToken);
