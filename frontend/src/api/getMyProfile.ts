@@ -49,13 +49,14 @@ export async function getMyProfile(
     let newToken: string | null = null;
     try {
       newToken = await refreshAccessToken();
+    
     } catch (refreshErr) {
       console.error("refreshAccessToken threw:", refreshErr);
       throw new Error("토큰 갱신 중 오류가 발생했습니다.");
     }
 
     if (!newToken) {
-      throw new Error("토큰 갱신에 실패했습니다.");
+      return Promise.reject(null);
     }
 
     try {

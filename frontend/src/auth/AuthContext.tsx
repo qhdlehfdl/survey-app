@@ -1,9 +1,11 @@
+// src/auth/AuthContext.tsx
 import React, {
   createContext,
   useContext,
   useEffect,
   useRef,
   useState,
+  useCallback,
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { refreshAccessToken } from "../api/refreshToken";
@@ -47,8 +49,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   function setAccessToken(t: string | null) {
     setAccessTokenState(t);
-    if (t) localStorage.setItem("accessToken", t);
-    else localStorage.removeItem("accessToken");
+    if (t) {
+      try {
+        localStorage.setItem("accessToken", t);
+      } catch (e) {
+        console.warn("localStorage set failed:", e);
+      }
+    } else {
+      try {
+        localStorage.removeItem("accessToken");
+      } catch (e) {
+        console.warn("localStorage remove failed:", e);
+      }
+    }
   }
 
   async function callRefreshOnce(): Promise<boolean> {
@@ -76,6 +89,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     refreshPromiseRef.current = p;
     return p;
   }
+
   useEffect(() => {
     if (initializedRef.current) return;
     initializedRef.current = true;
@@ -98,7 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function logout() {
+  const logout = useCallback(async () => {
     try {
       await fetch("/api/auth/logout", {
         method: "POST",
@@ -112,9 +126,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error("logout error", err);
     } finally {
       setAccessToken(null);
+      // 이동: sign-in으로 보내고 싶으면 "/sign-in"으로 바꾸세요
       navigate("/main");
     }
-  }
+  }, [accessToken, navigate]);
+
+  // 전역 이벤트 리스너: refresh 실패(IR T 등) 시 auth:refreshInvalid 이벤트를 받아 logout 호출
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.addEventListener) return;
+
+    const handler = (evt: Event) => {
+      // 로그 남기기
+      console.warn("auth:refreshInvalid event received, calling logout()");
+      // 비동기 호출
+      (async () => {
+        try {
+          await logout();
+        } catch (e) {
+          console.error("logout from event failed", e);
+        }
+      })();
+    };
+
+    window.addEventListener("auth:refreshInvalid", handler);
+
+    return () => {
+      window.removeEventListener("auth:refreshInvalid", handler);
+    };
+  }, [logout]);
 
   const value: AuthContextType = {
     isAuthenticated: !!accessToken,

@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import styles from "./RegisterForm.module.css";
 
 interface FormData {
-  userId: string;
+  username: string;
   password: string;
   nickname: string;
   email: string;
 }
 
 interface FormErrors {
-  userId?: string;
+  username?: string;
   password?: string;
   nickname?: string;
   email?: string;
@@ -26,7 +26,7 @@ const RegisterForm: React.FC = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<FormData>({
-    userId: "",
+    username: "",
     password: "",
     nickname: "",
     email: "",
@@ -41,8 +41,8 @@ const RegisterForm: React.FC = () => {
 
   const validateClient = (): boolean => {
     const newErrors: FormErrors = {};
-    if (formData.userId.length < 3 || formData.userId.length > 20) {
-      newErrors.userId = "아이디는 3자 이상 20자 이하로 입력해야 합니다.";
+    if (formData.username.length < 3 || formData.username.length > 20) {
+      newErrors.username = "아이디는 3자 이상 20자 이하로 입력해야 합니다.";
     }
     if (formData.password.length < 3 || formData.password.length > 20) {
       newErrors.password = "비밀번호는 3자 이상 20자 이하로 입력해야 합니다.";
@@ -78,7 +78,7 @@ const RegisterForm: React.FC = () => {
       const fieldErrors: FormErrors = {};
       switch (data.code) {
         case "DUPLICATE_ID":
-          fieldErrors.userId = data.message;
+          fieldErrors.username = data.message;
           break;
         case "DUPLICATE_EMAIL":
           fieldErrors.email = data.message;
@@ -107,15 +107,15 @@ const RegisterForm: React.FC = () => {
           <label className={styles.formLabel}>아이디</label>
           <input
             type="text"
-            name="userId"
+            name="username"
             className={styles.formInput}
             placeholder="아이디를 입력하세요"
-            value={formData.userId}
+            value={formData.username}
             onChange={handleChange}
             required
           />
-          {errors.userId && (
-            <p className={styles.errorText}>{errors.userId}</p>
+          {errors.username && (
+            <p className={styles.errorText}>{errors.username}</p>
           )}
         </div>
 

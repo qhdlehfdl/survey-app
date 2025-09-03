@@ -25,6 +25,7 @@ export default function MainPage() {
   const MAX_RETRIES = 3;
   const BASE_BACKOFF_MS = 800;
   const timeoutRef = useRef<number | null>(null);
+  const API_BASE_URL = "http://3.107.238.215:8080";
 
   const navigate = useNavigate();
   const { isAuthenticated, logout } = useAuth();

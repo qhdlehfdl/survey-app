@@ -6,12 +6,12 @@ import { useAuth } from "../../auth/AuthContext";
 import { refreshAccessToken } from "../../api/refreshToken";
 
 interface FormData {
-  userId: string;
+  username: string;
   password: string;
 }
 
 interface FormErrors {
-  userId?: string;
+  username?: string;
   password?: string;
   general?: string;
 }
@@ -28,7 +28,7 @@ const LoginForm: React.FC = () => {
   const { setAccessToken } = useAuth();
 
   const [formData, setFormData] = useState<FormData>({
-    userId: "",
+    username: "",
     password: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
@@ -41,7 +41,7 @@ const LoginForm: React.FC = () => {
 
   const validateClient = (): boolean => {
     const newErrors: FormErrors = {};
-    if (!formData.userId.trim()) newErrors.userId = "아이디를 입력하세요.";
+    if (!formData.username.trim()) newErrors.username = "아이디를 입력하세요.";
     if (!formData.password.trim())
       newErrors.password = "비밀번호를 입력하세요.";
     setErrors(newErrors);
@@ -96,6 +96,10 @@ const LoginForm: React.FC = () => {
     }
   };
 
+  const handleSocialLogin = (provider: string): void => {
+    window.location.href = `/api/oauth2/authorization/${provider}`;
+  }
+
   return (
     <div className={styles.loginContainer}>
       <h2 className={styles.loginTitle}>로그인</h2>
@@ -107,11 +111,11 @@ const LoginForm: React.FC = () => {
             name="userId"
             className={styles.formInput}
             placeholder="아이디를 입력하세요"
-            value={formData.userId}
+            value={formData.username}
             onChange={handleChange}
             required
           />
-          {errors.userId && <p className={styles.errorText}>{errors.userId}</p>}
+          {errors.username && <p className={styles.errorText}>{errors.username}</p>}
         </div>
 
         <div className={styles.formGroup}>
@@ -137,6 +141,10 @@ const LoginForm: React.FC = () => {
       </form>
       <div className={styles.footer}>
         아직 계정이 없으신가요? <a href="/sign-up">회원가입</a>
+      </div>
+        
+      <div className={styles.footer}>
+        <button onClick={()=>handleSocialLogin("kakao")}>카카오로 로그인</button>
       </div>
     </div>
   );

@@ -30,7 +30,18 @@ export default function FormBuilder() {
   }
 
   async function registerDraft(retry = false): Promise<void> {
-    const payload = { title, questions };
+    // 백엔드 DTO에 맞게 questions 변환
+    const payload = {
+      title,
+      questions: questions.map((q) => ({
+        id: q.id, // 필요시
+        text: q.text,
+        type: q.type,
+        options: q.options.map((opt) => opt.text), // Option[] -> string[]
+        required: q.required,
+        order: q.order || null,
+      })),
+    };
 
     try {
       const accessToken = localStorage.getItem("accessToken");
@@ -44,7 +55,7 @@ export default function FormBuilder() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`, // Bearer로 access token 전달
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(payload),
       });
@@ -54,13 +65,11 @@ export default function FormBuilder() {
       if (data.code === "SU") {
         console.log("등록 성공:", data);
         alert("설문지가 등록되었습니다.");
-        // 필요하다면 등록 후 페이지 이동
         window.location.href = "/";
         return;
       } else if (data.code === "DBE") {
-        const errorData = await res.json().catch(() => null);
-        console.error("등록 실패:", errorData || res.statusText);
-        alert(`등록 실패: ${errorData?.message || res.status}`);
+        console.error("등록 실패:", data.message || res.statusText);
+        alert(`등록 실패: ${data.message || res.status}`);
         return;
       } else if (data.code === "NP") {
         if (retry) {
@@ -71,9 +80,7 @@ export default function FormBuilder() {
         }
 
         const newAccessToken = await refreshAccessToken();
-
         if (!newAccessToken) {
-          // 갱신 실패 -> 강제 로그인
           alert("등록에 실패했습니다. 다시 로그인해주세요.");
           localStorage.removeItem("accessToken");
           window.location.href = "/sign-in";
@@ -89,6 +96,7 @@ export default function FormBuilder() {
       alert("서버 오류로 등록 실패");
     }
   }
+
 
   return (
     <div className={styles.builderWrap}>

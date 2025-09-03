@@ -18,4 +18,6 @@ export type Question = {
   // 메타 (서버에서 올 때 세팅)
   isExisting?: boolean; // 서버에서 온 기존 질문이면 true
   participantsNum?: number; // 서버가 준 질문별 참여자 수
+
+  order?: number;
 };
