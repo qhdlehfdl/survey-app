@@ -1,38 +1,32 @@
 package com.example.demo.filter;
 
-import com.example.demo.auth.dto.request.SignInRequestDto;
 import com.example.demo.auth.dto.response.CustomUserDetails;
 import com.example.demo.auth.entity.User;
 import com.example.demo.auth.repository.UserRepository;
 import com.example.demo.token.JwtProvider;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-    private final JwtProvider jwtProvider;
-    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
@@ -45,23 +39,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            Integer Id = jwtProvider.validateAccessToken(token);
+            Boolean isValid = JwtProvider.validateJwt(token, true);
 
-            if (Id == null) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            Optional<User> userOpt = userRepository.findById(Id);
-            if(userOpt.isEmpty()) {
+            if (!isValid) {
+                response.setContentType("application/json");
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType("application/json;charset=UTF-8");
-                response.getWriter().write("{\"code\":\"NP\",\"message\":\"User not found.\"}");
+                response.getWriter().write("{\"code\":\"NP\",\"message\":\"Expired token.\"}");
                 return;
             }
 
-            CustomUserDetails customUserDetails = new CustomUserDetails(userOpt.get());
-            Authentication authentication = new UsernamePasswordAuthenticationToken(customUserDetails.getId(), null, customUserDetails.getAuthorities());
+            String username = JwtProvider.getUsername(token);
+            String role = JwtProvider.getRole(token);
+
+            List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);

@@ -11,7 +11,6 @@ import com.example.demo.token.JwtProvider;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -41,7 +40,7 @@ public class AuthServiceImpl implements AuthService{
     public ResponseEntity<? super SignUpResponseDto> signUp(SignUpRequestDto dto) {
 
         try {
-            boolean existedUserId = userRepository.existsByUserId(dto.getUserId());
+            boolean existedUserId = userRepository.existsByUsername(dto.getUserId());
             if(existedUserId) return SignUpResponseDto.duplicateId();
 
             boolean existedNickname = userRepository.existsByNickname(dto.getNickname());
@@ -70,7 +69,7 @@ public class AuthServiceImpl implements AuthService{
 
         try {
             String userId = dto.getUserId();
-            User user = userRepository.findByUserId(userId);
+            User user = userRepository.findByUsername(userId);
             if(user == null) return SignInResponseDto.signInFail();
 
             String password = dto.getPassword();
@@ -80,11 +79,11 @@ public class AuthServiceImpl implements AuthService{
             if(!isMatched) return SignInResponseDto.signInFail();
 
             Integer id = user.getId();
+            String username = user.getUsername();
+            String role = user.getRoleType().name();
 
-            String role = "ROLE_USER";
-
-            accessToken = jwtProvider.createAccessKey(id, role);
-            refreshToken = jwtProvider.createRefreshKey(id, role);
+            accessToken = jwtProvider.createJwt(id, username, role, true);
+            refreshToken = jwtProvider.createJwt(id, username, role, false);
 
             refreshTokenService.saveToken(id, refreshToken);
         } catch (Exception e) {
@@ -113,11 +112,10 @@ public class AuthServiceImpl implements AuthService{
 
         if (refreshToken == null) return RefreshTokenResponseDto.invalidRefreshToken();
 
-        Integer userId;
-
+        Boolean isValid;
         try {
-            userId = jwtProvider.validateRefreshToken(refreshToken);
-        System.out.println("userId : " + userId.toString());
+            isValid = jwtProvider.validateJwt(refreshToken, false);
+
         } catch (ExpiredJwtException e) {
             e.printStackTrace();
             return RefreshTokenResponseDto.expiredRefreshToken();
@@ -127,9 +125,11 @@ public class AuthServiceImpl implements AuthService{
         }
 
 
-        if (userId == null) return RefreshTokenResponseDto.invalidRefreshToken();
+        if (!isValid) return RefreshTokenResponseDto.invalidRefreshToken();
 
-        String role = jwtProvider.getRoleFromRefreshToken(refreshToken);
+        Integer userId = jwtProvider.getSubject(refreshToken);
+        String username = jwtProvider.getUsername(refreshToken);
+        String role = jwtProvider.getRole(refreshToken);
 
         //redis에서 refresh token 가져옴
         Optional<String> refreshTokenOpt = refreshTokenService.getToken(userId);
@@ -144,8 +144,8 @@ public class AuthServiceImpl implements AuthService{
 
         System.out.println("storedRefreshToken : "+storedRefreshToken);
 
-        String newAccessToken = jwtProvider.createAccessKey(userId, role);
-        String newRefreshToken = jwtProvider.createRefreshKey(userId, role);
+        String newAccessToken = jwtProvider.createJwt(userId, username, role, true);
+        String newRefreshToken = jwtProvider.createJwt(userId, username ,role, false);
 
         //블랙리스트에 현재 refresh token 추가
         Duration remaining = jwtProvider.getRemainingValidity(refreshToken);
@@ -174,11 +174,11 @@ public class AuthServiceImpl implements AuthService{
         if(refreshToken == null) invalid = true;
 
         Integer userId = null;
-
+        Boolean isValid;
         try{
-            userId = jwtProvider.validateRefreshToken(refreshToken);
+            isValid = jwtProvider.validateJwt(refreshToken, false);
 
-            if(userId == null) invalid = true;
+            if(!isValid) invalid = true;
 
             //이미 그 전에 로그아웃한 경우 -> 블랙리스트에 refresh token 들어가 있음
             if (blacklistService.isBlacklisted(refreshToken)) invalid = true;

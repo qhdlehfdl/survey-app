@@ -1,17 +1,20 @@
 package com.example.demo.config;
 
+import com.example.demo.auth.entity.RoleType;
 import com.example.demo.auth.service.RefreshTokenService;
-import com.example.demo.filter.CustomLogoutFilter;
 import com.example.demo.filter.JwtAuthenticationFilter;
 import com.example.demo.filter.LoginFilter;
-import com.example.demo.token.JwtProvider;
+import com.example.demo.handler.LogoutHandlerImpl;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,6 +27,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -37,11 +41,25 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final AuthenticationConfiguration authenticationConfiguration;
-    private final JwtProvider jwtProvider;
-    private final CustomLogoutFilter customLogoutFilter;
+
+    //자체로그인, 소셜로그인
+    @Qualifier("LoginSuccessHandler")
+    private final AuthenticationSuccessHandler loginSuccessHandler;
+    @Qualifier("SocialLoginSuccessHandler")
+    private final AuthenticationSuccessHandler socialLoginSuccessHandler;
+
     private final RefreshTokenService refreshTokenService;
+
+//    public WebSecurityConfig(AuthenticationConfiguration authenticationConfiguration,
+//                             @Qualifier("LoginSuccessHandler") AuthenticationSuccessHandler loginSuccessHandler,
+//                             @Qualifier("SocialLoginSuccessHandler") AuthenticationSuccessHandler socialLoginSuccessHandler,
+//                             RefreshTokenService refreshTokenService) {
+//        this.authenticationConfiguration = authenticationConfiguration;
+//        this.loginSuccessHandler = loginSuccessHandler;
+//        this.socialLoginSuccessHandler = socialLoginSuccessHandler;
+//        this.refreshTokenService = refreshTokenService;
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -55,11 +73,6 @@ public class WebSecurityConfig {
     @Bean
     protected SecurityFilterChain configure(HttpSecurity httpSecurity) throws  Exception{
 
-        // LoginFilter를 위한 AuthenticationManager 설정
-        LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtProvider, refreshTokenService);
-        // LoginFilter가 처리할 URL을 명시적으로 설정
-        loginFilter.setFilterProcessesUrl("/api/auth/sign-in");
-
         httpSecurity
                 .cors(cors -> cors
                         .configurationSource(corsConfigrationSource())
@@ -71,18 +84,31 @@ public class WebSecurityConfig {
                 )
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/oauth2/**","/login/oauth2/**").permitAll()
                         .requestMatchers("/", "/api/auth/sign-in", "/api/auth/sign-up", "/api/auth/refresh", "/api/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/survey/**").permitAll()
                         .anyRequest().authenticated()
                 )
+                .oauth2Login(oauth2->oauth2
+                        .redirectionEndpoint(endpoint -> endpoint.baseUri("/login/oauth2/code/*"))
+                        .successHandler(socialLoginSuccessHandler)
+                )
+                .logout(logout -> logout.addLogoutHandler(new LogoutHandlerImpl(refreshTokenService)))
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new FailedAuthenticationEntryPoint())
                 )
-                .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtAuthenticationFilter, LoginFilter.class)
-                .addFilterBefore(customLogoutFilter, LogoutFilter.class);
+                .addFilterBefore(new LoginFilter(authenticationManager(authenticationConfiguration), loginSuccessHandler), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(), LoginFilter.class);
 
         return httpSecurity.build();
+    }
+
+    @Bean
+    public RoleHierarchy roleHierarchy(){
+        return RoleHierarchyImpl.withRolePrefix("ROLE_")
+                .role(RoleType.ADMIN.name())
+                .implies(RoleType.USER.name())
+                .build();
     }
 
     class FailedAuthenticationEntryPoint implements AuthenticationEntryPoint{

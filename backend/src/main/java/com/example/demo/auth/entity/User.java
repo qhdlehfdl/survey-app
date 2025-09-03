@@ -1,7 +1,6 @@
 package com.example.demo.auth.entity;
 
 import com.example.demo.auth.dto.request.SignUpRequestDto;
-import com.example.demo.auth.dto.response.SignUpResponseDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,8 +17,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "user_id")
-    private String userId;
+    @Column(name = "username")
+    private String username;
 
     @Column(name = "password")
     private String password;
@@ -30,21 +29,36 @@ public class User {
     @Column(name = "email")
     private String email;
 
+    @Column(name="is_lock")
+    private Boolean isLock;
+
     @Column(name = "is_social")
     private Boolean isSocial;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role_type")
+    private RoleType roleType;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "social_type")
     private SocialType socialType;
 
-    public enum SocialType{
-        NONE, KAKAO
-    }
 
     public User(SignUpRequestDto dto, String password) {
-        this.userId = dto.getUserId();
+        this.username = dto.getUserId();
         this.password = password;
         this.nickname = dto.getNickname();
         this.email = dto.getEmail();
+        this.isSocial = false;
+        this.socialType = SocialType.NONE;
+    }
+
+    //비밀번호는 외부에서 세팅
+    public User(String providerId, String email, String nickname, SocialType socialType) {
+        this.username = socialType.toString() + providerId;
+        this.email = email;
+        this.nickname = nickname;
+        this.isSocial = true;
+        this.socialType = socialType;
     }
 }

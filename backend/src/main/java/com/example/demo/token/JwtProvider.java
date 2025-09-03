@@ -1,18 +1,10 @@
 package com.example.demo.token;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -22,87 +14,73 @@ import java.util.Date;
 public class JwtProvider {
 
     @Value("${secret-key}")
-    private String accessKey;
+    private static String secretKey;
 
-    @Value("${refresh-key}")
-    private String refreshKey;
 
-    public String createAccessKey(Integer Id, String role){
+    public static String createJwt(Integer Id, String username, String role, Boolean isAccess){
 
-        Date expiredDate = Date.from(Instant.now().plus(20, ChronoUnit.MINUTES));
-        Key key = Keys.hmacShaKeyFor(accessKey.getBytes(StandardCharsets.UTF_8));
+        Date expiredDate = isAccess ? Date.from(Instant.now().plus(20, ChronoUnit.MINUTES)) : Date.from(Instant.now().plus(30, ChronoUnit.DAYS));
+        String type = isAccess ? "access" : "refresh";
 
         String jwt = Jwts.builder()
-                .signWith(SignatureAlgorithm.HS256, accessKey)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
                 .setSubject(Id.toString())
+                .claim("sub", username)
                 .claim("role", role)
+                .claim("type", type)
                 .setIssuedAt(new Date()).setExpiration(expiredDate)
                 .compact();
 
         return jwt;
     }
 
-    public String createRefreshKey(Integer Id, String role){
-
-        Date expiredDate = Date.from(Instant.now().plus(30, ChronoUnit.DAYS));
-        Key key = Keys.hmacShaKeyFor(refreshKey.getBytes(StandardCharsets.UTF_8));
-
-        String jwt = Jwts.builder()
-                .signWith(SignatureAlgorithm.HS256,refreshKey)
-                .setSubject(Id.toString())
-                .claim("role", role)
-                .setIssuedAt(new Date()).setExpiration(expiredDate)
-                .compact();
-
-        return jwt;
-    }
-
-    public Integer validateAccessToken(String jwt){
+    public static Boolean validateJwt(String jwt, Boolean isAccess){
         Claims claims = null;
 
         try{
             claims = Jwts.parserBuilder()
-                    .setSigningKey(accessKey)
+                    .setSigningKey(secretKey)
                     .build()
                     .parseClaimsJws(jwt).getBody();
+
+            String type = claims.get("type", String.class);
+            if(type == null) return false;
+
+            if(isAccess && !type.equals("access")) return false;
+            if(!isAccess && !type.equals("refresh")) return false;
+
+            return true;
         }catch(ExpiredJwtException e){
             e.printStackTrace();
             throw e;
         } catch (Exception e){
             e.printStackTrace();
-            return null;
+            return false;
         }
-
-        Integer id = Integer.valueOf(claims.getSubject());
-
-        return id;
     }
 
-    public Integer validateRefreshToken(String jwt){
-        Claims claims = null;
+    public static String getUsername(String token) {
+        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody().get("sub", String.class);
+    }
 
-        try{
-            claims = Jwts.parserBuilder()
-                    .setSigningKey(refreshKey)
-                    .build()
-                    .parseClaimsJws(jwt).getBody();
-        }catch(ExpiredJwtException e){
-            e.printStackTrace();
-            throw e;
-        } catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
+    public static String getRole(String token) {
+        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody().get("role", String.class);
+    }
 
-        Integer id = Integer.valueOf(claims.getSubject());
+    public static Integer getSubject(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
 
-        return id;
+        return Integer.parseInt(claims.getSubject());
     }
 
     //refresh 토큰 남은 시간 리턴
     public Duration getRemainingValidity(String refreshToken) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(refreshKey)
+                .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(refreshToken)
                 .getBody();
@@ -111,13 +89,5 @@ public class JwtProvider {
         long seconds = Duration.between(Instant.now(), exp.toInstant()).getSeconds();
 
         return Duration.ofSeconds(Math.max(seconds, 0));
-    }
-
-    public String getRoleFromAccessToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(accessKey).build().parseClaimsJws(token).getBody().get("role", String.class);
-    }
-
-    public String getRoleFromRefreshToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(refreshKey).build().parseClaimsJws(token).getBody().get("role", String.class);
     }
 }
