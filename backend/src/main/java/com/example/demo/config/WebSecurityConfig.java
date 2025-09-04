@@ -4,7 +4,9 @@ import com.example.demo.auth.entity.RoleType;
 import com.example.demo.auth.service.RefreshTokenService;
 import com.example.demo.filter.JwtAuthenticationFilter;
 import com.example.demo.filter.LoginFilter;
+import com.example.demo.handler.LoginSuccessHandler;
 import com.example.demo.handler.LogoutHandlerImpl;
+import com.example.demo.token.JwtProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,6 +29,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -42,24 +45,14 @@ import java.io.IOException;
 public class WebSecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final JwtProvider jwtProvider;
 
-    //자체로그인, 소셜로그인
+    //자체로그인, 소셜로그인 하나로 통합
     @Qualifier("LoginSuccessHandler")
     private final AuthenticationSuccessHandler loginSuccessHandler;
-    @Qualifier("SocialLoginSuccessHandler")
-    private final AuthenticationSuccessHandler socialLoginSuccessHandler;
-
+    @Qualifier("LoginFailureHandler")
+    private final AuthenticationFailureHandler loginFailureHandler;
     private final RefreshTokenService refreshTokenService;
-
-//    public WebSecurityConfig(AuthenticationConfiguration authenticationConfiguration,
-//                             @Qualifier("LoginSuccessHandler") AuthenticationSuccessHandler loginSuccessHandler,
-//                             @Qualifier("SocialLoginSuccessHandler") AuthenticationSuccessHandler socialLoginSuccessHandler,
-//                             RefreshTokenService refreshTokenService) {
-//        this.authenticationConfiguration = authenticationConfiguration;
-//        this.loginSuccessHandler = loginSuccessHandler;
-//        this.socialLoginSuccessHandler = socialLoginSuccessHandler;
-//        this.refreshTokenService = refreshTokenService;
-//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -91,14 +84,16 @@ public class WebSecurityConfig {
                 )
                 .oauth2Login(oauth2->oauth2
                         .redirectionEndpoint(endpoint -> endpoint.baseUri("/login/oauth2/code/*"))
-                        .successHandler(socialLoginSuccessHandler)
+                        .successHandler(loginSuccessHandler)
                 )
-                .logout(logout -> logout.addLogoutHandler(new LogoutHandlerImpl(refreshTokenService)))
+                .logout(logout -> logout
+                        .logoutUrl("/api/auth/logout")
+                        .addLogoutHandler(new LogoutHandlerImpl(refreshTokenService, jwtProvider)))
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new FailedAuthenticationEntryPoint())
                 )
-                .addFilterBefore(new LoginFilter(authenticationManager(authenticationConfiguration), loginSuccessHandler), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JwtAuthenticationFilter(), LoginFilter.class);
+                .addFilterBefore(new LoginFilter(authenticationManager(authenticationConfiguration), loginSuccessHandler, loginFailureHandler), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider), LoginFilter.class);
 
         return httpSecurity.build();
     }

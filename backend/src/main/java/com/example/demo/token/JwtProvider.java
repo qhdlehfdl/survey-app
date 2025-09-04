@@ -14,10 +14,9 @@ import java.util.Date;
 public class JwtProvider {
 
     @Value("${secret-key}")
-    private static String secretKey;
+    private String secretKey;
 
-
-    public static String createJwt(Integer Id, String username, String role, Boolean isAccess){
+    public String createJwt(Integer Id, String username, String role, Boolean isAccess){
 
         Date expiredDate = isAccess ? Date.from(Instant.now().plus(20, ChronoUnit.MINUTES)) : Date.from(Instant.now().plus(30, ChronoUnit.DAYS));
         String type = isAccess ? "access" : "refresh";
@@ -25,7 +24,6 @@ public class JwtProvider {
         String jwt = Jwts.builder()
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .setSubject(Id.toString())
-                .claim("sub", username)
                 .claim("role", role)
                 .claim("type", type)
                 .setIssuedAt(new Date()).setExpiration(expiredDate)
@@ -34,7 +32,7 @@ public class JwtProvider {
         return jwt;
     }
 
-    public static Boolean validateJwt(String jwt, Boolean isAccess){
+    public Boolean validateJwt(String jwt, Boolean isAccess){
         Claims claims = null;
 
         try{
@@ -59,15 +57,15 @@ public class JwtProvider {
         }
     }
 
-    public static String getUsername(String token) {
+    public String getUsername(String token) {
         return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody().get("sub", String.class);
     }
 
-    public static String getRole(String token) {
+    public String getRole(String token) {
         return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody().get("role", String.class);
     }
 
-    public static Integer getSubject(String token) {
+    public Integer getSubject(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()

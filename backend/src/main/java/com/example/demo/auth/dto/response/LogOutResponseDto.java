@@ -36,6 +36,8 @@ public class LogOutResponseDto extends ResponseDto {
                 .maxAge(0)
                 .sameSite("Strict").build();
 
+        System.out.println("responseDto");
+
         return ResponseEntity.status(HttpStatus.FORBIDDEN).header(HttpHeaders.SET_COOKIE, cookie.toString()).body(result);
     }
 }

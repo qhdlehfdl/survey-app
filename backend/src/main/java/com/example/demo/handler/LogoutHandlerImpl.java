@@ -6,6 +6,7 @@ import com.example.demo.common.ResponseMessage;
 import com.example.demo.token.JwtProvider;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NoArgsConstructor;
@@ -27,26 +28,33 @@ import java.util.Map;
 public class LogoutHandlerImpl implements LogoutHandler {
 
     private final RefreshTokenService refreshTokenService;
+    private final JwtProvider jwtProvider;
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
 
         try {
-            String body = new BufferedReader(new InputStreamReader(request.getInputStream()))
-                    .lines().reduce("", String::concat);
 
-            if(!StringUtils.hasText(body)) return;
+            String refreshToken = null;
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(body);
-            String refreshToken = jsonNode.has("refreshToken") ? jsonNode.get("refreshToken").asText():null;
+            if (request.getCookies() != null) {
+                for (Cookie cookie : request.getCookies()) {
+                    if("refreshToken".equals(cookie.getName())){
+                        refreshToken = cookie.getValue();
+                        break;
+                    }
+                }
+            }
+
 
             if(refreshToken == null) return;
 
-            Boolean isValid = JwtProvider.validateJwt(refreshToken, false);
+            Boolean isValid = jwtProvider.validateJwt(refreshToken, false);
             if(!isValid) return;
 
-            refreshTokenService.deleteToken((Integer) authentication.getPrincipal());
+            Integer userId = jwtProvider.getSubject(refreshToken);
+
+            refreshTokenService.deleteToken(userId);
 
             ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
                     .httpOnly(true).secure(true)
@@ -61,6 +69,8 @@ public class LogoutHandlerImpl implements LogoutHandler {
 
             response.setStatus(HttpStatus.OK.value());
             response.setContentType("application/json;charset=UTF-8");
+
+            ObjectMapper objectMapper = new ObjectMapper();
 
             String json = objectMapper.writeValueAsString(responseBody);
             response.getWriter().write(json);

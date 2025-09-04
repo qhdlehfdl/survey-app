@@ -1,8 +1,5 @@
 package com.example.demo.filter;
 
-import com.example.demo.auth.dto.response.CustomUserDetails;
-import com.example.demo.auth.entity.User;
-import com.example.demo.auth.repository.UserRepository;
 import com.example.demo.token.JwtProvider;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -22,16 +19,18 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private final JwtProvider jwtProvider;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
 
         try{
+
             String token = parseBearerToken(request);
 
             if (token == null) {
@@ -39,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            Boolean isValid = JwtProvider.validateJwt(token, true);
+            Boolean isValid = jwtProvider.validateJwt(token, true);
 
             if (!isValid) {
                 response.setContentType("application/json");
@@ -48,8 +47,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            String username = JwtProvider.getUsername(token);
-            String role = JwtProvider.getRole(token);
+            String username = jwtProvider.getUsername(token);
+            String role = jwtProvider.getRole(token);
 
             List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
 

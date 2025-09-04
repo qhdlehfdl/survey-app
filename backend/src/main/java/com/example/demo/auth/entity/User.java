@@ -49,16 +49,20 @@ public class User {
         this.password = password;
         this.nickname = dto.getNickname();
         this.email = dto.getEmail();
+        this.isLock = false;
         this.isSocial = false;
+        this.roleType = RoleType.USER;
         this.socialType = SocialType.NONE;
     }
 
     //비밀번호는 외부에서 세팅
-    public User(String providerId, String email, String nickname, SocialType socialType) {
-        this.username = socialType.toString() + providerId;
+    public User(String username, String email, String nickname, SocialType socialType) {
+        this.username = username;
         this.email = email;
         this.nickname = nickname;
+        this.isLock = false;
         this.isSocial = true;
+        this.roleType = RoleType.USER;
         this.socialType = socialType;
     }
 }

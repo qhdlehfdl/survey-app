@@ -1,12 +1,12 @@
 package com.example.demo.auth.service;
 
 import com.example.demo.auth.dto.response.CustomOAuth2User;
-import com.example.demo.auth.dto.response.CustomUserDetails;
 import com.example.demo.auth.entity.RoleType;
 import com.example.demo.auth.entity.SocialType;
 import com.example.demo.auth.entity.User;
 import com.example.demo.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -31,6 +32,8 @@ public class UserService extends DefaultOAuth2UserService implements UserDetails
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
+    private final SecureRandom RANDOM = new SecureRandom();
+    private static final String ALPHANUM = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     //자체 로그인
     @Transactional(readOnly = true)
@@ -67,7 +70,7 @@ public class UserService extends DefaultOAuth2UserService implements UserDetails
             Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
             Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
 
-            username = registrationId + "-" + attributes.get("id").toString();
+            username = registrationId + "_" + attributes.get("id").toString();
             email = (String) kakaoAccount.get("email");
             nickname = (String) profile.get("nickname");
         }else{
@@ -77,17 +80,39 @@ public class UserService extends DefaultOAuth2UserService implements UserDetails
         User user = userRepository.findByUsername(username);
 
         if (user == null) {
-            user = new User(username,email,nickname, SocialType.valueOf(registrationId));
-            user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+            int attempts = 0;
+            final int MAX_TRIES = 5;
+            while (true) {
+                attempts++;
+                String candidateNickname = nickname + "_" + randomSuffix(RANDOM.nextInt(10)); // 10글자 이하
+                user = new User(username, email, candidateNickname, SocialType.valueOf(registrationId));
+                user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+
+                try {
+                    userRepository.save(user);
+                    break; // 성공
+                } catch (DataIntegrityViolationException ex) {
+                    // 닉네임 unique 제약에 걸림(매우 드묾). 재시도 또는 실패 처리
+                    if (attempts >= MAX_TRIES)
+                        throw ex;
+                }
+            }
         }else{
-            //기존에 있는 유저 정보 업데이트
-            user.setNickname(nickname);
-            user.setEmail(email);
+            if (email != null && !email.equals(user.getEmail()))
+                user.setEmail(email);
         }
         userRepository.save(user);
 
         authorities = List.of(new SimpleGrantedAuthority(role));
 
         return new CustomOAuth2User(attributes, authorities, username);
+    }
+
+    private String randomSuffix(int len) {
+        StringBuilder sb = new StringBuilder(len);
+        for (int i = 0; i < len; i++) {
+            sb.append(ALPHANUM.charAt(RANDOM.nextInt(ALPHANUM.length())));
+        }
+        return sb.toString();
     }
 }
