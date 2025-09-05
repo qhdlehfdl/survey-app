@@ -56,7 +56,7 @@ Typescript + SpringBoot 기반으로 제작하였고 JWT 인증을 사용하였�
 
 
 ## ⚙️ERD
-<img width="1170" height="912" alt="survey ERD" src="https://github.com/user-attachments/assets/7c8a1623-6fa3-4607-8e6d-864d8ee5b5fb" />
+<img width="1170" height="912" alt="Copy of Copy of survey ERD" src="https://github.com/user-attachments/assets/953ff274-a467-4301-95c6-db56347598e0" />
 
 ---
 
