@@ -50,10 +50,12 @@ public class WebSecurityConfig {
     //자체로그인, 소셜로그인 하나로 통합
     @Qualifier("LoginSuccessHandler")
     private final AuthenticationSuccessHandler loginSuccessHandler;
+    @Qualifier("SocialLoginSuccessHandler")
+    private final AuthenticationSuccessHandler socialLoginSuccessHandler;
     @Qualifier("LoginFailureHandler")
     private final AuthenticationFailureHandler loginFailureHandler;
     private final RefreshTokenService refreshTokenService;
-
+    
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -84,7 +86,7 @@ public class WebSecurityConfig {
                 )
                 .oauth2Login(oauth2->oauth2
                         .redirectionEndpoint(endpoint -> endpoint.baseUri("/login/oauth2/code/*"))
-                        .successHandler(loginSuccessHandler)
+                        .successHandler(socialLoginSuccessHandler)
                 )
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")

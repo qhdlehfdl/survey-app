@@ -147,6 +147,8 @@ public class AuthServiceImpl implements AuthService{
         String newAccessToken = jwtProvider.createJwt(userId, username, role, true);
         String newRefreshToken = jwtProvider.createJwt(userId, username ,role, false);
 
+        System.out.println("newRefreshToken : " + newRefreshToken);
+
         //블랙리스트에 현재 refresh token 추가
         Duration remaining = jwtProvider.getRemainingValidity(refreshToken);
         blacklistService.blacklistToken(refreshToken, remaining);

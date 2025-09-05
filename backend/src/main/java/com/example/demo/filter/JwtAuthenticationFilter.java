@@ -49,10 +49,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             String username = jwtProvider.getUsername(token);
             String role = jwtProvider.getRole(token);
+            Integer userId = jwtProvider.getSubject(token);
 
             List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
 
-            Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+            Authentication authentication = new UsernamePasswordAuthenticationToken(userId, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
