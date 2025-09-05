@@ -22,7 +22,7 @@ Typescript + SpringBoot 기반으로 제작하였고 JWT 인증을 사용하였�
 - ### 로그인 플로우
 1. 요청이 들어오면 먼저 JwtAuthentication 필터를 만남. 로그인 요청이므로 jwt 없음 -> 그 다음 필터 진행  
 2. 로그인 필터 만남. 필터에서 authenticationManager.authenticate() 실행.
-3. authenticate()에서 UserService의 loadUserByUsername 함수 실행.
+3. authenticate()에서 UserService의 loadUserByUsername 함수 실행. 소셜로그인이라면 loadUser 함수 실행(기존 로그인 정보가 있으면 업데이트 후 로그인 진행. 없다면 새로 db에 정보 저장후 로그인 진행)
 4. 성공 후 authenticate()에서 Authentication 리턴.
 5. LoginSuccessHandler 실행.
 
@@ -32,7 +32,6 @@ Typescript + SpringBoot 기반으로 제작하였고 JWT 인증을 사용하였�
 3. 토큰에서 role, userId(db에서 pk값) 가져오고 UsernamePasswordAuthentication()으로 userId를 principal로 지정.
 
 - ### 소셜 로그인
-
 1. 프론트에서 백엔드로 리디렉션(fetch X). 
 2. 카카오 개발자에 설정해둔 리다이렉트 URI에 의해 카카오 서버가 로그인 창 띄워줌. 카카오 서버에서 로그인 과정(코드로 토큰 받고 토큰으로 유저정보 받음, 스프링부트가 알아서 수행) 진행
 3. 유저 정보로 로그인. access, refresh token 발급
@@ -44,7 +43,7 @@ Typescript + SpringBoot 기반으로 제작하였고 JWT 인증을 사용하였�
 
 해결방법으로 
 
-1. 로그인 성공 후 백엔드에서 짧은 생명주기를 가진 refresh token을 httpOnly로 쿠키 설정해주고 프론트의  OAuthCookieHandler.tsx 페이지로 리디렉션 시킨다.
+1. 로그인 성공 후 백엔드에서 짧은 생명주기를 가진 refresh token을 httpOnly로 쿠키 설정해주고 프론트의  /cookie url로 리디렉션 시킨다.
 2. 해당 페이지에서 httpOnly로 설정된 refresh 토큰을 넣어서 useEffect로 /refresh 요청을 보낸다.
 3. 새로운 access, refresh 토큰 발급. 로그인 완료
 
