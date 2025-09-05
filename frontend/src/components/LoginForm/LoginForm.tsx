@@ -97,8 +97,8 @@ const LoginForm: React.FC = () => {
   };
 
   const handleSocialLogin = (provider: string): void => {
-    window.location.href = `/api/oauth2/authorization/${provider}`;
-  }
+    window.location.href = `http://localhost:8080/oauth2/authorization/${provider}`;
+  };
 
   return (
     <div className={styles.loginContainer}>
@@ -108,7 +108,7 @@ const LoginForm: React.FC = () => {
           <label className={styles.formLabel}>아이디</label>
           <input
             type="text"
-            name="userId"
+            name="username"
             className={styles.formInput}
             placeholder="아이디를 입력하세요"
             value={formData.username}

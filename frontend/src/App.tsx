@@ -11,6 +11,7 @@ import SurveyDetail from "./components/SurveyDetail/SurveyDetail";
 import ProfilePage from "./components/ProfilePage/ProfilePage";
 import SurveyResultPage from "./components/SurveyResultPage/SurveyResultPage";
 import SurveyEditPage from "./components/SurveyEditPage/SurveyEditPage"
+import OAuthCookieHandler from "./components/OAuthCookieHandler/OAuthCookieHandler";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
       <Route path="/profile" element={<ProfilePage />} />
       <Route path="/survey/:id/result" element={<SurveyResultPage />} />
       <Route path="/survey/:id/edit" element={<SurveyEditPage />} />
+      <Route path="/cookie" element={<OAuthCookieHandler />} />
     </Routes>
   );
 }
